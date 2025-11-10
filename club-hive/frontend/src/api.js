@@ -1,72 +1,11 @@
-// Assign user as club_head/president/secretary for a specific club (admin only)
-export async function assignUserClubRole(userId, clubId, role, token) {
-  const res = await fetch(`${API_BASE}/users/${userId}/club-role`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ clubId, role })
-  });
-  if (!res.ok) throw new Error('Failed to assign club role');
-  return res.json();
-}
-// List all users (admin only)
-export async function getUsers(token) {
-  const res = await fetch(`${API_BASE}/users`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Failed to fetch users');
-  return res.json();
-}
+// --- API Base Configuration ---
+// Dynamically select API base depending on environment
+const API_BASE =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:5001/api';
 
-// Get user's club memberships (admin only)
-export async function getUserMemberships(userId, token) {
-  const res = await fetch(`${API_BASE}/users/${userId}/memberships`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Failed to fetch user memberships');
-  return res.json();
-}
+console.log("🌐 Using API base:", API_BASE); // Optional: Helps verify correct API endpoint
 
-// Promote user to club head (admin only)
-export async function promoteUser(userId, role, token) {
-  const res = await fetch(`${API_BASE}/users/${userId}/role`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ role })
-  });
-  if (!res.ok) throw new Error('Failed to promote user');
-  return res.json();
-}
-// Fetch pending join requests for a club (admin/club head)
-export async function getPendingMemberships(clubId, token) {
-  const res = await fetch(`${API_BASE}/clubs/${clubId}/pending`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Failed to fetch pending requests');
-  return res.json();
-}
-
-// Approve or reject a membership request
-export async function updateMembershipStatus(clubId, userId, status, token) {
-  const res = await fetch(`${API_BASE}/clubs/${clubId}/membership/${userId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ status })
-  });
-  if (!res.ok) throw new Error('Failed to update membership');
-  return res.json();
-}
-// Simple API utility for Club Hive frontend
-const API_BASE = 'http://localhost:5001/api';
-
+// --- Authentication ---
 export async function login(email, password) {
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',
@@ -95,19 +34,12 @@ export async function getMe(token) {
   return res.json();
 }
 
+// --- Clubs ---
 export async function getClubs(token) {
   const res = await fetch(`${API_BASE}/clubs`, {
     headers: { 'Authorization': `Bearer ${token}` }
   });
   if (!res.ok) throw new Error('Failed to fetch clubs');
-  return res.json();
-}
-
-export async function getEvents(token) {
-  const res = await fetch(`${API_BASE}/events`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Failed to fetch events');
   return res.json();
 }
 
@@ -119,15 +51,6 @@ export async function getMyClubs(token) {
   return res.json();
 }
 
-export async function getLeaderboard(token) {
-  const res = await fetch(`${API_BASE}/leaderboard`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Failed to fetch leaderboard');
-  return res.json();
-}
-
-// Get club members
 export async function getClubMembers(clubId, token) {
   const res = await fetch(`${API_BASE}/clubs/${clubId}/members`, {
     headers: { 'Authorization': `Bearer ${token}` }
@@ -136,7 +59,6 @@ export async function getClubMembers(clubId, token) {
   return res.json();
 }
 
-// Update member role in club
 export async function updateMemberRole(clubId, userId, role, roleName, token) {
   const res = await fetch(`${API_BASE}/clubs/${clubId}/members/${userId}/role`, {
     method: 'PUT',
@@ -153,7 +75,6 @@ export async function updateMemberRole(clubId, userId, role, roleName, token) {
   return res.json();
 }
 
-// Remove member from club
 export async function removeMemberFromClub(clubId, userId, token) {
   const res = await fetch(`${API_BASE}/clubs/${clubId}/members/${userId}`, {
     method: 'DELETE',
@@ -163,7 +84,6 @@ export async function removeMemberFromClub(clubId, userId, token) {
   return res.json();
 }
 
-// Update club (admin only)
 export async function updateClub(clubId, name, description, token) {
   const res = await fetch(`${API_BASE}/clubs/${clubId}`, {
     method: 'PUT',
@@ -177,7 +97,6 @@ export async function updateClub(clubId, name, description, token) {
   return res.json();
 }
 
-// Delete club (admin only)
 export async function deleteClub(clubId, token) {
   const res = await fetch(`${API_BASE}/clubs/${clubId}`, {
     method: 'DELETE',
@@ -187,7 +106,15 @@ export async function deleteClub(clubId, token) {
   return res.json();
 }
 
-// Register for an event
+// --- Events ---
+export async function getEvents(token) {
+  const res = await fetch(`${API_BASE}/events`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error('Failed to fetch events');
+  return res.json();
+}
+
 export async function registerForEvent(eventId, token) {
   const res = await fetch(`${API_BASE}/events/${eventId}/register`, {
     method: 'POST',
@@ -200,7 +127,6 @@ export async function registerForEvent(eventId, token) {
   return res.json();
 }
 
-// Unregister from an event
 export async function unregisterFromEvent(eventId, token) {
   const res = await fetch(`${API_BASE}/events/${eventId}/register`, {
     method: 'DELETE',
@@ -213,7 +139,6 @@ export async function unregisterFromEvent(eventId, token) {
   return res.json();
 }
 
-// Get event participants (for board members/admin)
 export async function getEventParticipants(eventId, token) {
   const res = await fetch(`${API_BASE}/events/${eventId}/participants`, {
     headers: { 'Authorization': `Bearer ${token}` }
@@ -222,7 +147,6 @@ export async function getEventParticipants(eventId, token) {
   return res.json();
 }
 
-// Check if current user is registered for an event
 export async function checkMyRegistration(eventId, token) {
   const res = await fetch(`${API_BASE}/events/${eventId}/my-registration`, {
     headers: { 'Authorization': `Bearer ${token}` }
@@ -231,7 +155,6 @@ export async function checkMyRegistration(eventId, token) {
   return res.json();
 }
 
-// Mark attendance for event participant (board members/admin)
 export async function markAttendance(eventId, userId, status, token) {
   const res = await fetch(`${API_BASE}/events/${eventId}/attendance`, {
     method: 'PUT',
@@ -247,3 +170,77 @@ export async function markAttendance(eventId, userId, status, token) {
   }
   return res.json();
 }
+
+// --- Leaderboard ---
+export async function getLeaderboard(token) {
+  const res = await fetch(`${API_BASE}/leaderboard`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error('Failed to fetch leaderboard');
+  return res.json();
+}
+
+// --- Admin / User Management ---
+export async function assignUserClubRole(userId, clubId, role, token) {
+  const res = await fetch(`${API_BASE}/users/${userId}/club-role`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ clubId, role })
+  });
+  if (!res.ok) throw new Error('Failed to assign club role');
+  return res.json();
+}
+
+export async function getUsers(token) {
+  const res = await fetch(`${API_BASE}/users`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error('Failed to fetch users');
+  return res.json();
+}
+
+export async function getUserMemberships(userId, token) {
+  const res = await fetch(`${API_BASE}/users/${userId}/memberships`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error('Failed to fetch user memberships');
+  return res.json();
+}
+
+export async function promoteUser(userId, role, token) {
+  const res = await fetch(`${API_BASE}/users/${userId}/role`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ role })
+  });
+  if (!res.ok) throw new Error('Failed to promote user');
+  return res.json();
+}
+
+export async function getPendingMemberships(clubId, token) {
+  const res = await fetch(`${API_BASE}/clubs/${clubId}/pending`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error('Failed to fetch pending requests');
+  return res.json();
+}
+
+export async function updateMembershipStatus(clubId, userId, status, token) {
+  const res = await fetch(`${API_BASE}/clubs/${clubId}/membership/${userId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!res.ok) throw new Error('Failed to update membership');
+  return res.json();
+}
+
