@@ -1,9 +1,13 @@
 // --- API Base Configuration ---
 // Dynamically select API base depending on environment
-const API_BASE =
-  import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:5001/api';
+// Ensures the final URL always includes "/api"
+const API_BASE = (() => {
+  let base = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  base = base.replace(/\/+$/, ''); // remove trailing slash
+  return `${base}/api`;
+})();
 
-console.log("🌐 Using API base:", API_BASE); // Optional: Helps verify correct API endpoint
+console.log("🌐 Using API base:", API_BASE); // Helps verify correct API endpoint
 
 // --- Authentication ---
 export async function login(email, password) {
